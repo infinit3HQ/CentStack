@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { suggestCategory, CATEGORIES } from '@/lib/categoryUtils';
+import { useEncryption } from '@/components/EncryptionProvider';
 
 interface ParsedRow {
   date: string;
@@ -131,6 +132,7 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
   const [fileName, setFileName] = useState('');
 
   const createMany = useMutation(api.transactions.createMany);
+  const { isEnabled, isUnlocked, encryptValue } = useEncryption();
 
   useEffect(() => {
     const handleOpenCSVImport = () => setOpen(true);
@@ -186,13 +188,18 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
     setImporting(true);
     try {
       const validRows = rows.filter(r => r.valid);
-      const transactions = validRows.map(r => ({
-        amount: r.amount,
-        type: r.type,
-        category: r.category,
-        description: r.description,
-        date: new Date(r.date).getTime(),
-      }));
+      const shouldEncrypt = isEnabled && isUnlocked;
+
+      const transactions = await Promise.all(
+        validRows.map(async (r) => ({
+          amount: shouldEncrypt ? await encryptValue(String(r.amount)) : r.amount,
+          type: r.type,
+          category: r.category,
+          description: shouldEncrypt ? await encryptValue(r.description) : r.description,
+          date: new Date(r.date).getTime(),
+          encrypted: shouldEncrypt || undefined,
+        }))
+      );
 
       // Batch in groups of 100
       for (let i = 0; i < transactions.length; i += 100) {
@@ -206,7 +213,7 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
     } finally {
       setImporting(false);
     }
-  }, [rows, createMany]);
+  }, [rows, createMany, isEnabled, isUnlocked, encryptValue]);
 
   const reset = useCallback(() => {
     setHeaders([]);

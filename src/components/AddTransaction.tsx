@@ -7,6 +7,7 @@ import * as z from 'zod';
 import { PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { suggestCategory, CATEGORIES } from '@/lib/categoryUtils';
+import { useEncryption } from '@/components/EncryptionProvider';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +36,7 @@ type TransactionFormValues = z.infer<typeof formSchema>;
 export function AddTransaction({ trigger }: { trigger?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const createTransaction = useMutation(api.transactions.create);
+  const { isEnabled, isUnlocked, encryptValue } = useEncryption();
 
   useEffect(() => {
     const handleOpenAddTransaction = () => setOpen(true);
@@ -64,9 +66,15 @@ export function AddTransaction({ trigger }: { trigger?: React.ReactNode }) {
   }, [description, form]);
 
   async function onSubmit(values: TransactionFormValues) {
+    const shouldEncrypt = isEnabled && isUnlocked;
+
     await createTransaction({
-      ...values,
+      amount: shouldEncrypt ? await encryptValue(String(values.amount)) : values.amount,
+      description: shouldEncrypt ? await encryptValue(values.description) : values.description,
+      type: values.type,
+      category: values.category,
       date: Date.now(),
+      encrypted: shouldEncrypt || undefined,
     });
     setOpen(false);
     form.reset();

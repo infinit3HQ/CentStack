@@ -217,7 +217,7 @@ function LandingPage() {
               {[
                 { icon: Shield, title: "Privacy First", desc: "Keep your sensitive financial data on your own infrastructure." },
                 { icon: TrendingUp, title: "Real-time Tracking", desc: "Instant updates and reactive data powered by Convex." },
-                { icon: Lock, title: "Secure by Design", desc: "Authenticated access control and per-user data isolation, out of the box." }
+                { icon: Lock, title: "AES-256 Encrypted", desc: "Client-side AES-256-GCM encryption. Your key never leaves your browser." }
               ].map((feature, i) => (
                 <motion.div
                   key={i}
@@ -276,14 +276,13 @@ import { CSVImport } from '@/components/CSVImport';
 import { MobileNav } from '@/components/MobileNav';
 import { useUser } from '@clerk/tanstack-react-start';
 import { Card } from '@/components/ui/card';
-import { useQuery } from 'convex/react';
-import { api } from '../../convex/_generated/api';
 import { useMemo } from 'react';
+import { useDecryptedTransactions } from '@/hooks/useDecryptedTransactions';
 
 function Dashboard() {
   const { user } = useUser();
   const userName = user?.firstName || 'User';
-  const transactions = useQuery(api.transactions.get);
+  const transactions = useDecryptedTransactions();
 
   const stats = useMemo(() => {
     if (!transactions) return { balance: 0, monthlyNet: 0, income: 0, expenses: 0 };

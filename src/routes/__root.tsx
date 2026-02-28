@@ -6,6 +6,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import Header from '../components/Header'
 import { ConvexClientProvider } from '../components/ConvexClientProvider'
 import { CommandPalette } from '../components/CommandPalette'
+import { EncryptionProvider } from '../components/EncryptionProvider'
 import appCss from '../app.css?url'
 
 export const Route = createRootRoute({
@@ -42,9 +43,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </head>
         <body>
           <ConvexClientProvider>
-            <Header />
-            <CommandPalette />
-            {children}
+            <EncryptionProvider>
+              <Header />
+              <CommandPalette />
+              {children}
+            </EncryptionProvider>
           </ConvexClientProvider>
           <TanStackDevtools
             config={{

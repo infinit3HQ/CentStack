@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
-import { useQuery } from 'convex/react';
-import { api } from '../../convex/_generated/api';
 import { motion } from 'framer-motion';
+import { useDecryptedTransactions } from '@/hooks/useDecryptedTransactions';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
@@ -19,7 +18,7 @@ const CHART_STYLE = {
 };
 
 export function SpendingCharts() {
-  const transactions = useQuery(api.transactions.get);
+  const transactions = useDecryptedTransactions();
 
   const categoryData = useMemo(() => {
     if (!transactions || transactions.length === 0) return [];

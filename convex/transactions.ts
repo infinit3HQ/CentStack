@@ -17,11 +17,12 @@ export const get = query({
 
 export const create = mutation({
   args: {
-    amount: v.number(),
+    amount: v.union(v.number(), v.string()),
     type: v.union(v.literal("income"), v.literal("expense")),
     category: v.string(),
     description: v.string(),
     date: v.number(),
+    encrypted: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -38,11 +39,12 @@ export const createMany = mutation({
   args: {
     transactions: v.array(
       v.object({
-        amount: v.number(),
+        amount: v.union(v.number(), v.string()),
         type: v.union(v.literal("income"), v.literal("expense")),
         category: v.string(),
         description: v.string(),
         date: v.number(),
+        encrypted: v.optional(v.boolean()),
       }),
     ),
   },

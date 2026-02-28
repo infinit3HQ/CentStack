@@ -1,12 +1,14 @@
-import { useQuery, useMutation } from 'convex/react';
+import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useDecryptedTransactions } from '@/hooks/useDecryptedTransactions';
+import { Id } from '../../convex/_generated/dataModel';
 
 export function TransactionList() {
-  const transactions = useQuery(api.transactions.get);
+  const transactions = useDecryptedTransactions();
   const deleteTransaction = useMutation(api.transactions.remove);
 
   if (!transactions) {
@@ -87,7 +89,7 @@ export function TransactionList() {
                     variant="ghost" 
                     size="icon" 
                     className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => deleteTransaction({ id: t._id })}
+                    onClick={() => deleteTransaction({ id: t._id as Id<"transactions"> })}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     <span className="sr-only">Delete</span>
