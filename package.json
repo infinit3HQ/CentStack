@@ -7,7 +7,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "convex:local": "convex dev --url http://127.0.0.1:3210 --admin-key \"convex-self-hosted|010afd91b7e928476e8f3f8c43edc0b78fc0bc27f8b0894bfe3f11187158b8f4efaf845565\"",
+    "convex:local": "convex dev --url http://127.0.0.1:3210 --admin-key \"centstack|0140945e8143d1473961c863359f3b33509101fa5deb2e7615065bcb0f4418556937d0f476\"",
     "dev:all": "bash scripts/dev.sh"
   },
   "dependencies": {
