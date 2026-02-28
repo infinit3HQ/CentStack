@@ -72,7 +72,7 @@ function LandingPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
           >
-            Smart, beautiful money management that you actually own. Host it yourself or let us handle the infrastructure.
+            Smart, beautiful money management that you own. Self-host for full control over your financial data.
           </motion.p>
 
           <motion.div
@@ -157,8 +157,8 @@ function LandingPage() {
           
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: Database, title: "1. Connect", desc: "Import your data securely. We support CSV imports and manual entries with a lightning-fast UI." },
-              { icon: Zap, title: "2. Categorize", desc: "Organize your transactions effortlessly. Our smart system helps you keep everything tidy." },
+              { icon: Database, title: "1. Connect", desc: "Import your data securely via CSV or add transactions manually with a lightning-fast UI." },
+              { icon: Zap, title: "2. Categorize", desc: "Organize your transactions effortlessly. Smart auto-categorization keeps everything tidy." },
               { icon: LineChart, title: "3. Analyze", desc: "Gain actionable insights. Beautiful charts and reports help you understand your spending habits." }
             ].map((step, i) => (
               <motion.div
@@ -203,7 +203,7 @@ function LandingPage() {
                   "Complete privacy and data ownership",
                   "No vendor lock-in",
                   "Open source and transparent",
-                  "Lightning fast edge performance"
+                  "Real-time reactive data updates"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
                     <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0" />
@@ -216,8 +216,8 @@ function LandingPage() {
             <div className="grid gap-4">
               {[
                 { icon: Shield, title: "Privacy First", desc: "Keep your sensitive financial data on your own infrastructure." },
-                { icon: TrendingUp, title: "Real-time Tracking", desc: "Instant updates and instantaneous load times." },
-                { icon: Lock, title: "Secure by Design", desc: "Bank-grade encryption for all your data, out of the box." }
+                { icon: TrendingUp, title: "Real-time Tracking", desc: "Instant updates and reactive data powered by Convex." },
+                { icon: Lock, title: "Secure by Design", desc: "Authenticated access control and per-user data isolation, out of the box." }
               ].map((feature, i) => (
                 <motion.div
                   key={i}
@@ -253,12 +253,16 @@ function LandingPage() {
             © {new Date().getFullYear()} CentStack. Open source money management.
           </p>
           <div className="flex gap-4">
-            <Button variant="ghost" size="icon" className="hover:text-primary rounded-full">
-              <Github className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="hover:text-primary rounded-full">
-              <Twitter className="w-5 h-5" />
-            </Button>
+            <a href="https://github.com/infinit3HQ/CentStack" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="hover:text-primary rounded-full">
+                <Github className="w-5 h-5" />
+              </Button>
+            </a>
+            <a href="https://twitter.com/Niraj_Dilshan" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="hover:text-primary rounded-full">
+                <Twitter className="w-5 h-5" />
+              </Button>
+            </a>
           </div>
         </div>
       </footer>
@@ -267,6 +271,8 @@ function LandingPage() {
 }
 
 import { TransactionList } from '@/components/TransactionList';
+import { SpendingCharts } from '@/components/SpendingCharts';
+import { CSVImport } from '@/components/CSVImport';
 import { MobileNav } from '@/components/MobileNav';
 import { useUser } from '@clerk/tanstack-react-start';
 import { Card } from '@/components/ui/card';
@@ -358,9 +364,12 @@ function Dashboard() {
       >
         <div className="flex justify-between items-center">
           <h3 className="text-xl font-semibold font-mono">transactions.log</h3>
+          <CSVImport />
         </div>
         <TransactionList />
       </motion.div>
+
+      <SpendingCharts />
 
       <div className="md:hidden">
         <MobileNav />

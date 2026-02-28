@@ -9,7 +9,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
-import { Calculator, Calendar, CreditCard, Settings, Smile, User } from "lucide-react";
+import { Calculator, Upload, CreditCard, Settings } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 
 export function CommandPalette() {
@@ -46,9 +46,11 @@ export function CommandPalette() {
             <span>Add Transaction</span>
             <CommandShortcut>⌘ T</CommandShortcut>
           </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => console.log('Import Data'))}>
-            <Calendar className="mr-2 h-4 w-4" />
-            <span>Import Data</span>
+          <CommandItem onSelect={() => runCommand(() => {
+              document.dispatchEvent(new CustomEvent('open-csv-import'));
+          })}>
+            <Upload className="mr-2 h-4 w-4" />
+            <span>Import CSV</span>
           </CommandItem>
         </CommandGroup>
         <CommandSeparator />

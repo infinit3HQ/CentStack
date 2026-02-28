@@ -34,6 +34,35 @@ export const create = mutation({
   },
 });
 
+export const createMany = mutation({
+  args: {
+    transactions: v.array(
+      v.object({
+        amount: v.number(),
+        type: v.union(v.literal("income"), v.literal("expense")),
+        category: v.string(),
+        description: v.string(),
+        date: v.number(),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
+    if (args.transactions.length > 100) {
+      throw new Error("Maximum 100 transactions per batch");
+    }
+
+    for (const tx of args.transactions) {
+      await ctx.db.insert("transactions", {
+        userId: identity.subject,
+        ...tx,
+      });
+    }
+  },
+});
+
 export const remove = mutation({
   args: {
     id: v.id("transactions"),

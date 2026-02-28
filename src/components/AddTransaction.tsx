@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { suggestCategory, CATEGORIES } from '@/lib/categoryUtils';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -50,6 +51,17 @@ export function AddTransaction({ trigger }: { trigger?: React.ReactNode }) {
       type: "expense",
     },
   });
+
+  // Auto-categorize when description changes
+  const description = form.watch('description');
+  useEffect(() => {
+    if (description && description.length > 2) {
+      const suggested = suggestCategory(description);
+      if (suggested !== 'other') {
+        form.setValue('category', suggested);
+      }
+    }
+  }, [description, form]);
 
   async function onSubmit(values: TransactionFormValues) {
     await createTransaction({
@@ -177,12 +189,9 @@ export function AddTransaction({ trigger }: { trigger?: React.ReactNode }) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="food">Food</SelectItem>
-                            <SelectItem value="transport">Transport</SelectItem>
-                            <SelectItem value="utilities">Utilities</SelectItem>
-                            <SelectItem value="entertainment">Entertainment</SelectItem>
-                            <SelectItem value="salary">Salary</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                            {CATEGORIES.map(c => (
+                              <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
