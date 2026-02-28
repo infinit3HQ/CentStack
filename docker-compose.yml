@@ -1,0 +1,15 @@
+services:
+  convex:
+    image: ghcr.io/get-convex/convex-backend:latest
+    ports:
+      - "3210:3210"
+      - "3211:3211"
+    volumes:
+      - convex-data:/var/lib/convex/storage
+    environment:
+      - CONVEX_LISTEN_PORT=3210
+      - CONVEX_SITE_PORT=3211
+      - CLERK_ISSUER_URL=${CLERK_ISSUER_URL}
+
+volumes:
+  convex-data:
