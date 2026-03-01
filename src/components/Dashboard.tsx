@@ -109,58 +109,55 @@ export function Dashboard() {
           </div>
         </section>
 
-        {/* ── STAT ROW ────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.35, delay: 0.12 }}
           style={{ borderBottom: '1px solid hsl(0 0% 14%)' }}
-          className="overflow-x-auto"
         >
-          <div className="flex min-w-max sm:min-w-0 sm:grid sm:grid-cols-3"
-               style={{ borderColor: 'hsl(0 0% 14%)' }}>
+          <div className="grid grid-cols-3">
 
             {/* Income */}
-            <div className="flex-1 min-w-[180px] px-6 py-5 relative cursor-default group"
+            <div className="px-3 sm:px-6 py-4 sm:py-5 relative cursor-default"
                  style={{ borderRight: '1px solid hsl(0 0% 14%)' }}>
               <div className="absolute left-0 top-3 bottom-3 w-px"
                    style={{ background: 'hsl(142 60% 52% / 0.4)' }} />
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">inflow</p>
-              <div className="flex items-center gap-1.5 mb-3">
-                <ArrowUpRight className="h-3 w-3" style={{ color: 'hsl(142 55% 52%)' }} />
-                <span className="font-mono text-[10px] uppercase tracking-widest"
+              <p className="font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">inflow</p>
+              <div className="flex items-center gap-1 sm:gap-1.5 mb-2 sm:mb-3">
+                <ArrowUpRight className="h-3 w-3 shrink-0" style={{ color: 'hsl(142 55% 52%)' }} />
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest hidden sm:inline"
                       style={{ color: 'hsl(142 55% 52%)' }}>income</span>
               </div>
-              <p className="font-mono text-2xl sm:text-3xl num-display text-foreground">
+              <p className="font-mono text-base sm:text-2xl lg:text-3xl num-display text-foreground">
                 ${fmt(stats.income)}
               </p>
             </div>
 
             {/* Expenses */}
-            <div className="flex-1 min-w-[180px] px-6 py-5 relative cursor-default group"
+            <div className="px-3 sm:px-6 py-4 sm:py-5 relative cursor-default"
                  style={{ borderRight: '1px solid hsl(0 0% 14%)' }}>
               <div className="absolute left-0 top-3 bottom-3 w-px"
                    style={{ background: 'hsl(3 90% 58% / 0.5)' }} />
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">outflow</p>
-              <div className="flex items-center gap-1.5 mb-3">
-                <ArrowDownRight className="h-3 w-3 text-destructive" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-destructive">expenses</span>
+              <p className="font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">outflow</p>
+              <div className="flex items-center gap-1 sm:gap-1.5 mb-2 sm:mb-3">
+                <ArrowDownRight className="h-3 w-3 shrink-0 text-destructive" />
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-destructive hidden sm:inline">expenses</span>
               </div>
-              <p className="font-mono text-2xl sm:text-3xl num-display text-foreground">
+              <p className="font-mono text-base sm:text-2xl lg:text-3xl num-display text-foreground">
                 ${fmt(stats.expenses)}
               </p>
             </div>
 
             {/* Net */}
-            <div className="flex-1 min-w-[180px] px-6 py-5 relative cursor-default group">
+            <div className="px-3 sm:px-6 py-4 sm:py-5 relative cursor-default">
               <div className="absolute left-0 top-3 bottom-3 w-px"
                    style={{ background: 'hsl(0 0% 28%)' }} />
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">balance</p>
-              <div className="flex items-center gap-1.5 mb-3">
-                <Wallet className="h-3 w-3 text-muted-foreground" />
-                <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">net_pos</span>
+              <p className="font-mono text-[8px] sm:text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1">balance</p>
+              <div className="flex items-center gap-1 sm:gap-1.5 mb-2 sm:mb-3">
+                <Wallet className="h-3 w-3 shrink-0 text-muted-foreground" />
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:inline">net_pos</span>
               </div>
-              <p className={`font-mono text-2xl sm:text-3xl num-display ${stats.balance < 0 ? 'text-destructive' : 'text-foreground'}`}>
+              <p className={`font-mono text-base sm:text-2xl lg:text-3xl num-display ${stats.balance < 0 ? 'text-destructive' : 'text-foreground'}`}>
                 {stats.balance < 0 ? '-' : ''}${fmt(stats.balance)}
               </p>
             </div>
