@@ -1,9 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Berkeley+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "Roboto Mono", monospace;
-  --radius: 0.5rem;
+  --font-mono: "JetBrains Mono", "Berkeley Mono", "Fira Code", monospace;
+  --font-serif: "JetBrains Mono", "Berkeley Mono", monospace;
+  --radius: 0rem;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -34,55 +38,142 @@
   --color-ring: hsl(var(--ring));
 }
 
+/* ── Always dark — developer-first terminal aesthetic ── */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 221.2 83.2% 53.3%;
-}
-
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 217.2 91.2% 59.8%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 224.3 76.3% 48%;
+  --background: 0 0% 5%;       /* #0D0D0D */
+  --foreground: 120 3% 88%;    /* #E0E3DF off-white */
+  --card: 0 0% 7%;             /* #121212 */
+  --card-foreground: 120 3% 88%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 120 3% 88%;
+  --primary: 142 60% 52%;      /* Phosphor green #3FD068 */
+  --primary-foreground: 0 0% 5%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 120 3% 88%;
+  --muted: 0 0% 11%;
+  --muted-foreground: 0 0% 42%;
+  --accent: 142 40% 18%;       /* Green tinted dark */
+  --accent-foreground: 142 60% 65%;
+  --destructive: 3 90% 58%;    /* #F43F3F */
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 14%;
+  --input: 0 0% 14%;
+  --ring: 142 60% 52%;
 }
 
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
+  }
+  html {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-mono);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background: hsl(142 60% 52% / 0.25);
+    color: hsl(142 60% 70%);
+  }
+  
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: hsl(0 0% 20%); }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(142 50% 30%); }
+}
+
+@layer utilities {
+
+  /* ── Dot-grid background ─────────────────────────── */
+  .dot-grid {
+    background-image: radial-gradient(circle, hsl(0 0% 22%) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* ── Scanline overlay ────────────────────────────── */
+  .scanlines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      hsl(0 0% 0% / 0.06) 3px,
+      hsl(0 0% 0% / 0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Phosphor text glow ──────────────────────────── */
+  .text-glow {
+    text-shadow: 0 0 20px hsl(142 60% 52% / 0.5), 0 0 40px hsl(142 60% 52% / 0.2);
+  }
+
+  .text-glow-sm {
+    text-shadow: 0 0 8px hsl(142 60% 52% / 0.4);
+  }
+
+  /* ── Terminal prompt prefix ──────────────────────── */
+  .terminal-prompt::before {
+    content: '> ';
+    color: hsl(142 60% 52%);
+    opacity: 0.7;
+  }
+
+  /* ── Monospace number display ────────────────────── */
+  .num-display {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    letter-spacing: -0.03em;
+  }
+
+  /* ── Terminal border box ─────────────────────────── */
+  .term-box {
+    border: 1px solid hsl(0 0% 14%);
+    position: relative;
+  }
+
+  .term-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid hsl(142 60% 52% / 0.06);
+    pointer-events: none;
+  }
+
+  /* ── Subtle green left accent line ──────────────── */
+  .accent-left {
+    border-left: 2px solid hsl(142 60% 52% / 0.6);
+  }
+
+  /* ── Status indicator ─────────────────────────────── */
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: hsl(142 60% 52%);
+    box-shadow: 0 0 0 2px hsl(142 60% 52% / 0.2);
+    animation: pulse-dot 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 2px hsl(142 60% 52% / 0.2); }
+    50%       { box-shadow: 0 0 0 4px hsl(142 60% 52% / 0.08); }
+  }
+
+  /* ── Row hover: terminal reverse video ──────────── */
+  .tr-hover {
+    transition: background 0.1s ease;
+  }
+  .tr-hover:hover {
+    background: hsl(142 60% 52% / 0.06);
+    border-color: hsl(142 60% 52% / 0.2);
   }
 }

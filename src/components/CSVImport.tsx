@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { Upload, FileText, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle2, Loader2, XSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
@@ -87,7 +87,6 @@ function parseRow(row: string[], mapping: ColumnMapping): ParsedRow {
     const amountStr = row[mapping.amount] || '0';
     const typeStr = mapping.type >= 0 ? (row[mapping.type] || '').toLowerCase() : '';
 
-    // Parse amount — handle negative numbers and currency symbols
     const cleanAmount = amountStr.replace(/[^0-9.\-]/g, '');
     const amount = Math.abs(parseFloat(cleanAmount));
 
@@ -95,24 +94,20 @@ function parseRow(row: string[], mapping: ColumnMapping): ParsedRow {
       return { date: dateStr, description, amount: 0, type: 'expense', category: 'other', valid: false, error: 'Invalid amount' };
     }
 
-    // Parse date
     const parsedDate = new Date(dateStr);
     if (isNaN(parsedDate.getTime())) {
       return { date: dateStr, description, amount, type: 'expense', category: 'other', valid: false, error: 'Invalid date' };
     }
 
-    // Determine type
     let type: 'income' | 'expense' = 'expense';
     if (typeStr.includes('income') || typeStr.includes('credit') || typeStr.includes('deposit')) {
       type = 'income';
     } else if (parseFloat(cleanAmount) > 0 && mapping.type < 0) {
-      // If no type column and amount is positive, try to infer
       type = 'income';
     } else if (parseFloat(cleanAmount) < 0) {
       type = 'expense';
     }
 
-    // Auto-categorize
     const category = suggestCategory(description);
 
     return { date: dateStr, description, amount, type, category, valid: true };
@@ -201,7 +196,6 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
         }))
       );
 
-      // Batch in groups of 100
       for (let i = 0; i < transactions.length; i += 100) {
         const batch = transactions.slice(i, i + 100);
         await createMany({ transactions: batch });
@@ -228,38 +222,37 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
     <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
       <SheetTrigger asChild>
         {trigger || (
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2 rounded-none border-2 border-border font-mono uppercase tracking-widest text-xs hover:bg-foreground hover:text-background transition-none">
             <Upload className="h-4 w-4" />
             Import CSV
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="font-mono">import_csv</SheetTitle>
-          <SheetDescription>Upload a CSV file to import transactions in bulk.</SheetDescription>
+      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto border-l-4 border-border/10 bg-background/95 backdrop-blur-xl">
+        <SheetHeader className="border-b-2 border-border pb-6 mb-8 text-left">
+          <SheetTitle className="font-serif text-4xl tracking-tight">Import Records</SheetTitle>
+          <SheetDescription className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Batched transaction ingestion protocol.</SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
-          {/* File Upload */}
+        <div className="space-y-8">
           {!done && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <label
-                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all group"
+                className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-border cursor-pointer hover:bg-foreground hover:text-background transition-colors group"
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <Upload className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors mb-2" />
-                  <p className="text-sm text-muted-foreground">
+                  <Upload className="w-8 h-8 text-muted-foreground group-hover:text-background mb-4" />
+                  <p className="text-sm font-mono uppercase tracking-widest">
                     {fileName ? (
                       <span className="flex items-center gap-2">
                         <FileText className="w-4 h-4" />
                         {fileName}
                       </span>
                     ) : (
-                      <span>Click to upload <span className="font-mono text-primary">.csv</span></span>
+                      <span>Select <span className="text-primary group-hover:text-background font-bold">.csv</span> file</span>
                     )}
                   </p>
                 </div>
@@ -273,32 +266,31 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
             </motion.div>
           )}
 
-          {/* Column Mapping */}
           {headers.length > 0 && !done && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="space-y-3"
+              className="space-y-4"
             >
-              <h4 className="text-sm font-medium text-muted-foreground font-mono">column_mapping</h4>
-              <div className="grid grid-cols-2 gap-3">
+              <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-widest border-b border-border pb-2">Column Mapping</h4>
+              <div className="grid grid-cols-2 gap-4">
                 {EXPECTED_HEADERS.map((field) => (
-                  <div key={field} className="space-y-1">
-                    <label className="text-xs text-muted-foreground capitalize">{field}</label>
+                  <div key={field} className="space-y-2">
+                    <label className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase">{field}</label>
                     <Select
                       value={String(mapping[field as keyof ColumnMapping])}
                       onValueChange={(v) => updateMapping(field as keyof ColumnMapping, parseInt(v))}
                     >
-                      <SelectTrigger className="h-8 text-xs">
+                      <SelectTrigger className="h-10 text-xs rounded-none border-2 border-border font-mono">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="rounded-none border-2 border-border">
                         {field === 'type' && (
-                          <SelectItem value="-1">Auto-detect</SelectItem>
+                          <SelectItem value="-1" className="font-mono text-xs">Auto-detect</SelectItem>
                         )}
                         {headers.map((h, i) => (
-                          <SelectItem key={i} value={String(i)}>{h}</SelectItem>
+                          <SelectItem key={i} value={String(i)} className="font-mono text-xs">{h}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -308,41 +300,39 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
             </motion.div>
           )}
 
-          {/* Preview Table */}
           {rows.length > 0 && !done && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="space-y-3"
+              className="space-y-4"
             >
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium text-muted-foreground font-mono">preview</h4>
-                <div className="flex items-center gap-3 text-xs">
-                  <span className="flex items-center gap-1 text-green-500">
+              <div className="flex items-end justify-between border-b border-border pb-2">
+                <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-widest">Preview</h4>
+                <div className="flex items-center gap-3 text-[10px] font-mono uppercase tracking-widest">
+                  <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
                     <CheckCircle2 className="w-3 h-3" /> {validCount} valid
                   </span>
                   {invalidCount > 0 && (
-                    <span className="flex items-center gap-1 text-red-500">
+                    <span className="flex items-center gap-1 text-destructive">
                       <AlertCircle className="w-3 h-3" /> {invalidCount} errors
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="border border-border rounded-xl overflow-hidden max-h-80 overflow-y-auto">
-                <table className="w-full text-xs">
-                  <thead className="bg-muted/50 sticky top-0">
+              <div className="border-2 border-border overflow-hidden max-h-80 overflow-y-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-foreground text-background sticky top-0 font-mono uppercase tracking-widest">
                     <tr>
-                      <th className="px-3 py-2 text-left font-mono text-muted-foreground">Date</th>
-                      <th className="px-3 py-2 text-left font-mono text-muted-foreground">Description</th>
-                      <th className="px-3 py-2 text-right font-mono text-muted-foreground">Amount</th>
-                      <th className="px-3 py-2 text-left font-mono text-muted-foreground">Type</th>
-                      <th className="px-3 py-2 text-left font-mono text-muted-foreground">Category</th>
-                      <th className="px-3 py-2 w-8"></th>
+                      <th className="px-3 py-3 font-normal">Date</th>
+                      <th className="px-3 py-3 font-normal">Description</th>
+                      <th className="px-3 py-3 font-normal text-right">Amount</th>
+                      <th className="px-3 py-3 font-normal">Cat</th>
+                      <th className="px-3 py-3 w-8"></th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="font-mono">
                     <AnimatePresence>
                       {rows.slice(0, 50).map((row, i) => (
                         <motion.tr
@@ -350,37 +340,30 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: i * 0.02 }}
-                          className={`border-t border-border/50 ${!row.valid ? 'bg-destructive/5' : 'hover:bg-muted/20'}`}
+                          className={`border-b border-border/50 ${!row.valid ? 'bg-destructive/10 text-destructive' : 'hover:bg-muted/30'}`}
                         >
-                          <td className="px-3 py-2 whitespace-nowrap">{row.date}</td>
-                          <td className="px-3 py-2 truncate max-w-[150px]">{row.description}</td>
-                          <td className="px-3 py-2 text-right font-mono">${row.amount.toFixed(2)}</td>
-                          <td className="px-3 py-2">
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] ${
-                              row.type === 'income' ? 'bg-green-500/10 text-green-500' : 'bg-zinc-500/10 text-zinc-400'
-                            }`}>
-                              {row.type}
-                            </span>
-                          </td>
+                          <td className="px-3 py-3 whitespace-nowrap opacity-70">{row.date}</td>
+                          <td className="px-3 py-3 truncate max-w-[120px] font-serif tracking-tight">{row.description}</td>
+                          <td className="px-3 py-3 text-right">${row.amount.toFixed(2)}</td>
                           <td className="px-3 py-2">
                             <Select
                               value={row.category}
                               onValueChange={(v) => updateRowCategory(i, v)}
                             >
-                              <SelectTrigger className="h-6 text-[10px] w-24 border-none bg-transparent px-1">
+                              <SelectTrigger className="h-7 text-[10px] w-24 rounded-none border-border bg-transparent px-2 font-mono uppercase">
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="rounded-none border-2 border-border font-mono text-[10px] uppercase">
                                 {CATEGORIES.map(c => (
                                   <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
                           </td>
-                          <td className="px-3 py-2">
+                          <td className="px-3 py-3">
                             {!row.valid && (
                               <span title={row.error}>
-                                <AlertCircle className="w-3.5 h-3.5 text-destructive" />
+                                <XSquare className="w-4 h-4 text-destructive" />
                               </span>
                             )}
                           </td>
@@ -390,7 +373,7 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
                   </tbody>
                 </table>
                 {rows.length > 50 && (
-                  <div className="px-3 py-2 text-center text-xs text-muted-foreground bg-muted/30">
+                  <div className="px-3 py-3 text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground bg-muted/50 border-t border-border">
                     Showing 50 of {rows.length} rows
                   </div>
                 )}
@@ -399,42 +382,45 @@ export function CSVImport({ trigger }: { trigger?: React.ReactNode }) {
               <Button
                 onClick={handleImport}
                 disabled={importing || validCount === 0}
-                className="w-full gap-2"
+                className="w-full gap-3 h-14 rounded-none border-2 border-foreground bg-background text-foreground hover:bg-foreground hover:text-background font-mono uppercase tracking-widest font-bold shadow-[4px_4px_0_0_hsl(var(--foreground))] hover:translate-y-1 hover:shadow-none transition-all"
               >
                 {importing ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Importing...
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processing...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-4 h-4" />
-                    Import {validCount} Transactions
+                    <Upload className="w-5 h-5" />
+                    Commit {validCount} Records
                   </>
                 )}
               </Button>
             </motion.div>
           )}
 
-          {/* Success State */}
           {done && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center py-12 space-y-4"
+              className="flex flex-col items-center justify-center py-16 space-y-6 border-2 border-border text-center"
             >
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
               >
-                <CheckCircle2 className="w-16 h-16 text-green-500" />
+                <div className="w-20 h-20 bg-foreground text-background flex items-center justify-center">
+                  <CheckCircle2 className="w-10 h-10" />
+                </div>
               </motion.div>
-              <h3 className="text-lg font-semibold">Import Complete!</h3>
-              <p className="text-sm text-muted-foreground">{validCount} transactions imported successfully.</p>
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={reset}>Import More</Button>
-                <Button onClick={() => setOpen(false)}>Done</Button>
+              <div>
+                <h3 className="text-2xl font-serif font-bold mb-2">Ingestion Complete</h3>
+                <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{validCount} records committed to ledger.</p>
+              </div>
+              <div className="flex gap-4 mt-4">
+                <Button variant="outline" onClick={reset} className="rounded-none border-2 border-border font-mono uppercase tracking-widest text-xs px-6">New Batch</Button>
+                <Button onClick={() => setOpen(false)} className="rounded-none bg-foreground text-background hover:bg-foreground/90 font-mono uppercase tracking-widest text-xs px-6">Close</Button>
               </div>
             </motion.div>
           )}
