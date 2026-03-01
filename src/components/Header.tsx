@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { SignedIn, UserButton } from '@clerk/tanstack-react-start';
 import { motion } from 'framer-motion';
-import { Upload, Plus, Terminal, ShieldCheck, ShieldOff, ShieldAlert } from 'lucide-react';
+import { Upload, Plus, Terminal, ShieldCheck, ShieldOff, ShieldAlert, Settings } from 'lucide-react';
 import { Button } from './ui/button';
 import { CSVImport } from './CSVImport';
 import { AddTransaction } from './AddTransaction';
@@ -113,6 +113,17 @@ export default function Header() {
               new
             </Button>
           } />
+
+          {/* Settings */}
+          <Link
+            to="/settings"
+            className="hidden sm:flex h-7 w-7 items-center justify-center transition-colors"
+            style={{ border: '1px solid hsl(0 0% 16%)', color: 'hsl(0 0% 38%)' }}
+            activeProps={{ style: { borderColor: 'hsl(142 60% 52% / 0.4)', color: 'hsl(142 55% 52%)' } }}
+            title="Settings"
+          >
+            <Settings className="h-3.5 w-3.5" />
+          </Link>
 
           <div className="h-7 w-7 flex items-center justify-center">
             <UserButton afterSignOutUrl="/" />
